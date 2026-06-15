@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#14121e">
+  <title>Frieren — Cognitive AI Control Center</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Progressive Web App client for Frieren. Monitor and control your AI partner's cognitive state, memories, goals, skills, and system logs.">
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- CSS Styling -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Icons (FontAwesome) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation (Desktop) -->
+    <aside class="sidebar">
+      <div class="logo-area">
+        <img src="assets/icon-192.png" alt="Frieren Magic Icon" class="logo-icon">
+        <h1>FRIEREN</h1>
+        <span>Cognitive Center</span>
+      </div>
+      
+      <ul class="nav-menu">
+        <li class="nav-item active" data-target="panel-chat" id="nav-chat">
+          <i class="fa-solid fa-comments"></i> Chat Room
+        </li>
+        <li class="nav-item" data-target="panel-memory" id="nav-memory">
+          <i class="fa-solid fa-brain"></i> Memory Explorer
+        </li>
+        <li class="nav-item" data-target="panel-controls" id="nav-controls">
+          <i class="fa-solid fa-sliders"></i> Control Panel
+        </li>
+        <li class="nav-item" data-target="panel-metrics" id="nav-metrics">
+          <i class="fa-solid fa-chart-simple"></i> System Metrics
+        </li>
+        <li class="nav-item" data-target="panel-actions" id="nav-actions">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Actions
+        </li>
+        <li class="nav-item" data-target="panel-history" id="nav-history">
+          <i class="fa-solid fa-clock-rotate-left"></i> History Log
+        </li>
+      </ul>
+      
+      <div class="sidebar-footer">
+        <div class="status-badge">
+          <span class="status-dot offline" id="connection-dot"></span>
+          <span id="connection-lbl">Checking...</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Bottom Navigation Bar (Mobile) -->
+    <nav class="mobile-nav-bar">
+      <div class="mobile-nav-item active" data-target="panel-chat" id="m-nav-chat">
+        <i class="fa-solid fa-comments"></i> Chat
+      </div>
+      <div class="mobile-nav-item" data-target="panel-memory" id="m-nav-memory">
+        <i class="fa-solid fa-brain"></i> Memory
+      </div>
+      <div class="mobile-nav-item" data-target="panel-controls" id="m-nav-controls">
+        <i class="fa-solid fa-sliders"></i> Control
+      </div>
+      <div class="mobile-nav-item" data-target="panel-metrics" id="m-nav-metrics">
+        <i class="fa-solid fa-chart-simple"></i> Metrics
+      </div>
+      <div class="mobile-nav-item" data-target="panel-actions" id="m-nav-actions">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Actions
+      </div>
+    </nav>
+    
+    <!-- Main Window content -->
+    <main class="main-content">
+      
+      <!-- Top Header -->
+      <header class="top-header">
+        <h2 id="current-panel-title">Chat Room</h2>
+        <div class="header-actions">
+          <button class="btn-settings" id="btn-open-settings" aria-label="Open Settings">
+            <i class="fa-solid fa-gear"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Panel 1: Chat Room -->
+      <section class="content-panel active" id="panel-chat">
+        <div class="chat-room">
+          <div class="chat-messages" id="chat-messages" role="log">
+            <!-- Messages populated dynamically -->
+            <div class="message-wrapper frieren">
+              <div class="message-bubble">
+                Hello. I am Frieren. What would you like to explore today?
+              </div>
+              <div class="message-timestamp">09:00 AM</div>
+            </div>
+          </div>
+          
+          <div class="chat-input-bar">
+            <button class="chat-btn" id="btn-toggle-mic" title="Voice Input" aria-label="Voice Input">
+              <i class="fa-solid fa-microphone"></i>
+            </button>
+            <input type="text" id="chat-input" placeholder="Type a message to Frieren..." autocomplete="off">
+            <button class="chat-btn" id="btn-toggle-speak" title="Voice Output Toggle" aria-label="Toggle Voice Output">
+              <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <button class="chat-btn" id="btn-send" title="Send Message" aria-label="Send Message">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 2: Memory Explorer -->
+      <section class="content-panel" id="panel-memory">
+        <div class="memory-search-row">
+          <div class="search-box-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="memory-search-input" placeholder="Search long-term memories...">
+          </div>
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="episodic">Episodic</button>
+            <button class="filter-btn" data-filter="semantic">Semantic</button>
+          </div>
+        </div>
+        
+        <div class="memory-results" id="memory-results">
+          <!-- Memory cards loaded dynamically -->
+        </div>
+      </section>
+
+      <!-- Panel 3: Control Panel -->
+      <section class="content-panel" id="panel-controls">
+        <div class="panel-grid-2">
+          
+          <!-- Sleep Wake status card -->
+          <div class="glass-panel state-control-widget">
+            <h3 class="panel-title">Operational State</h3>
+            <div class="state-display-badge awake" id="state-badge">
+              <i class="fa-solid fa-sun" id="state-icon"></i> <span id="state-lbl">AWAKE</span>
+            </div>
+            <div class="state-btn-row">
+              <button class="control-btn wake" id="btn-wake-system">
+                <i class="fa-solid fa-sun"></i> Wake Up
+              </button>
+              <button class="control-btn sleep" id="btn-sleep-system">
+                <i class="fa-solid fa-moon"></i> Sleep
+              </button>
+            </div>
+          </div>
+          
+          <!-- Voice Settings Card -->
+          <div class="glass-panel">
+            <h3 class="panel-title">Voice Synthesis Preferences</h3>
+            <div class="voice-settings-form">
+              <div class="form-group-toggle">
+                <span>Voice Enabled</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="voice-toggle-enabled" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="form-group-toggle">
+                <span>Auto Speak Responses</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="voice-toggle-autospeak" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="form-group-slider">
+                <div class="slider-label-row">
+                  <span>Speech Rate</span>
+                  <span id="lbl-voice-rate">1.0x</span>
+                </div>
+                <input type="range" id="voice-rate" min="0.5" max="2" step="0.1" value="1">
+              </div>
+              <div class="form-group-slider">
+                <div class="slider-label-row">
+                  <span>Volume</span>
+                  <span id="lbl-voice-volume">100%</span>
+                </div>
+                <input type="range" id="voice-volume" min="0" max="1" step="0.1" value="1">
+              </div>
+              <div class="form-group-slider">
+                <div class="slider-label-row">
+                  <span>Pitch</span>
+                  <span id="lbl-voice-pitch">1.0</span>
+                </div>
+                <input type="range" id="voice-pitch" min="0.5" max="1.5" step="0.1" value="1">
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Notifications Card -->
+        <div class="glass-panel notification-widget">
+          <div>
+            <h4 style="font-size: 15px; margin-bottom: 4px;">System Notifications</h4>
+            <p style="font-size: 12px; color: var(--text-muted);">Enable proactive sql reminders, goals reminders and notification services.</p>
+          </div>
+          <button class="control-btn wake" id="btn-notifications">
+            <i class="fa-solid fa-bell"></i> Request Permission
+          </button>
+        </div>
+      </section>
+
+      <!-- Panel 4: System Metrics -->
+      <section class="content-panel" id="panel-metrics">
+        
+        <!-- Stat widgets -->
+        <div class="stats-grid-4">
+          <div class="stat-tile">
+            <i class="fa-solid fa-database"></i>
+            <div class="stat-tile-val" id="metric-semantic">0</div>
+            <div class="stat-tile-lbl">Semantic</div>
+          </div>
+          <div class="stat-tile">
+            <i class="fa-solid fa-clock"></i>
+            <div class="stat-tile-val" id="metric-episodic">0</div>
+            <div class="stat-tile-lbl">Episodic</div>
+          </div>
+          <div class="stat-tile">
+            <i class="fa-solid fa-bullseye"></i>
+            <div class="stat-tile-val" id="metric-goals">0</div>
+            <div class="stat-tile-lbl">Active Goals</div>
+          </div>
+          <div class="stat-tile">
+            <i class="fa-solid fa-layer-group"></i>
+            <div class="stat-tile-val" id="metric-projects">0</div>
+            <div class="stat-tile-lbl">Projects</div>
+          </div>
+          <div class="stat-tile">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <div class="stat-tile-val" id="metric-skills">0</div>
+            <div class="stat-tile-lbl">Skills</div>
+          </div>
+          <div class="stat-tile">
+            <i class="fa-solid fa-circle-nodes"></i>
+            <div class="stat-tile-val" id="metric-reflections">0</div>
+            <div class="stat-tile-lbl">Reflections</div>
+          </div>
+        </div>
+        
+        <!-- Diagnostic Telemetry -->
+        <div class="glass-panel">
+          <h3 class="panel-title">Brain Diagnostics Status</h3>
+          <div class="diagnostics-grid">
+            <div>
+              <div class="diagnostic-item">
+                <div class="diagnostic-lbl-row">
+                  <i class="fa-solid fa-server"></i>
+                  <span>SQLite DB</span>
+                </div>
+                <span class="diagnostic-badge yellow" id="diag-sqlite">Checking</span>
+              </div>
+              <div class="diagnostic-item">
+                <div class="diagnostic-lbl-row">
+                  <i class="fa-solid fa-bolt"></i>
+                  <span>Redis Working Store</span>
+                </div>
+                <span class="diagnostic-badge yellow" id="diag-redis">Checking</span>
+              </div>
+              <div class="diagnostic-item">
+                <div class="diagnostic-lbl-row">
+                  <i class="fa-solid fa-network-wired"></i>
+                  <span>Chroma Vector Store</span>
+                </div>
+                <span class="diagnostic-badge yellow" id="diag-chromadb">Checking</span>
+              </div>
+              <div class="diagnostic-item">
+                <div class="diagnostic-lbl-row">
+                  <i class="fa-solid fa-memory"></i>
+                  <span>Memory System</span>
+                </div>
+                <span class="diagnostic-badge yellow" id="diag-memory">Checking</span>
+              </div>
+            </div>
+            
+            <div>
+              <div class="diagnostic-item">
+                <div class="diagnostic-lbl-row">
+                  <i class="fa-solid fa-microchip"></i>
+                  <span>Reasoning Engine</span>
+                </div>
+                <span class="diagnostic-badge yellow" id="diag-reasoning">Checking</span>
+              </div>
+              <div class="diagnostic-item">
+                <div class="diagnostic-lbl-row">
+                  <i class="fa-solid fa-glasses"></i>
+                  <span>Reflection Engine</span>
+                </div>
+                <span class="diagnostic-badge yellow" id="diag-reflection">Checking</span>
+              </div>
+              <div class="diagnostic-item">
+                <div class="diagnostic-lbl-row">
+                  <i class="fa-solid fa-handshake"></i>
+                  <span>Representative Engine</span>
+                </div>
+                <span class="diagnostic-badge yellow" id="diag-representative">Checking</span>
+              </div>
+              <div class="diagnostic-item">
+                <div class="diagnostic-lbl-row">
+                  <i class="fa-solid fa-robot"></i>
+                  <span>Proactive Assistant</span>
+                </div>
+                <span class="diagnostic-badge yellow" id="diag-proactive">Checking</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 5: Representative Actions -->
+      <section class="content-panel" id="panel-actions">
+        <div class="actions-layout">
+          <!-- Submit Action card -->
+          <div class="glass-panel">
+            <h3 class="panel-title">Execute Representative Task</h3>
+            <div class="execute-action-row">
+              <input type="text" id="action-input" placeholder="Enter task (e.g. Research Topic: Magic spells, Generate Report: Project usage)...">
+              <button class="execute-btn" id="btn-submit-action">Execute</button>
+            </div>
+          </div>
+          
+          <!-- Actions List -->
+          <div>
+            <h4 style="font-family: var(--font-title); color: var(--color-gold); font-size: 16px; margin-bottom: 16px;">Action Telemetry Log</h4>
+            <div class="actions-list" id="actions-list">
+              <!-- Dynamically populated Representative task cards -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 6: Conversation History -->
+      <section class="content-panel" id="panel-history">
+        <div class="history-filters">
+          <input type="date" id="history-filter-date" placeholder="Filter by Date">
+          <input type="text" id="history-filter-session" placeholder="Filter by Session ID">
+          <input type="text" id="history-filter-device" placeholder="Filter by Device ID">
+          <button class="filter-btn" id="btn-reset-history-filters">Reset Filters</button>
+        </div>
+        
+        <div class="history-list" id="history-list">
+          <!-- Dynamically populated History exchange items -->
+        </div>
+      </section>
+      
+    </main>
+    
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settings-modal">
+      <div class="glass-panel modal-box">
+        <div class="modal-header">
+          <h3>Connection settings</h3>
+          <button class="modal-close" id="btn-close-settings">&times;</button>
+        </div>
+        <div class="settings-grid">
+          <div class="settings-field">
+            <label for="set-backend-url">Backend Endpoint URL</label>
+            <input type="text" id="set-backend-url" placeholder="http://localhost:8000">
+          </div>
+          <div class="settings-field">
+            <label for="set-api-key">X-API-Key</label>
+            <input type="password" id="set-api-key" placeholder="frieren-dev-key-123">
+          </div>
+          <div class="settings-field">
+            <label for="set-user-id">User ID</label>
+            <input type="text" id="set-user-id" placeholder="vikash">
+          </div>
+          <div class="settings-field">
+            <label for="set-device-id">Device ID</label>
+            <input type="text" id="set-device-id" placeholder="device-1">
+          </div>
+          <div class="settings-field">
+            <label for="set-session-id">Session ID</label>
+            <input type="text" id="set-session-id" placeholder="Click to rotate session" readonly style="cursor: pointer;">
+          </div>
+        </div>
+        <button class="btn-save-settings" id="btn-save-settings">Apply Config</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Client Script -->
+  <script src="js/app.js"></script>
+</body>
+</html>
